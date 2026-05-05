@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">InsDrama</string>
+    <string name="search_hint">Cari drama atau genre...</string>
+    <string name="episodes_format">%d Episode</string>
+    <string name="play">Putar</string>
+    <string name="detail">Detail</string>
+    <string name="loading">Memuat drama...</string>
+    <string name="error_load">Gagal memuat data</string>
+    <string name="retry">Coba Lagi</string>
+    <string name="no_internet">Tidak ada koneksi internet</string>
+    <string name="next_episode">Episode Selanjutnya</string>
+    <string name="previous_episode">Episode Sebelumnya</string>
+    <string name="episode_format">Episode %d</string>
+    <string name="genres">Genre</string>
+    <string name="description">Deskripsi</string>
+    <string name="related_dramas">Drama Serupa</string>
+    <string name="swipe_up">Geser ke atas untuk drama berikutnya</string>
+    <string name="swipe_down">Geser ke bawah untuk drama sebelumnya</string>
+</resources>
