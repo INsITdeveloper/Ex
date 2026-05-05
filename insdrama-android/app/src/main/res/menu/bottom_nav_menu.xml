@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_temukan"
+        android:icon="@drawable/ic_temukan"
+        android:title="Temukan" />
+    <item
+        android:id="@+id/nav_cuplikan"
+        android:icon="@drawable/ic_play"
+        android:title="Cuplikan" />
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/ic_history"
+        android:title="History" />
+    <item
+        android:id="@+id/nav_downloads"
+        android:icon="@drawable/ic_download"
+        android:title="Downloads" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+</menu>
