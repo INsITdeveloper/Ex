@@ -134,13 +134,37 @@ class PlayerActivity : AppCompatActivity() {
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
-                // Swipe up/down for volume/brightness could be added here
+                if (e1 == null) return false
+                val diffY = e2.y - e1.y
+                val diffX = e2.x - e1.x
+                if (Math.abs(diffY) > Math.abs(diffX)) {
+                    if (Math.abs(diffY) > 100 && Math.abs(velocityY) > 100) {
+                        if (diffY < 0) {
+                            // Swipe up - next episode
+                            playNextEpisode()
+                        } else {
+                            // Swipe down - previous episode
+                            playPreviousEpisode()
+                        }
+                        return true
+                    }
+                }
                 return false
             }
         })
 
-        binding.playerView.setOnTouchListener { _, event ->
+        binding.playerView.setOnTouchListener { v, event ->
             gestureDetector.onTouchEvent(event)
+            v.performClick()
+            true
+        }
+    }
+
+    private fun playPreviousEpisode() {
+        if (currentEpisodeIndex > 0) {
+            currentEpisodeIndex--
+            loadEpisode(currentEpisodeIndex)
+            saveToHistory()
         }
     }
 

@@ -17,12 +17,10 @@ class MainActivity : AppCompatActivity() {
 
     // Store fragment instances to maintain state
     private val homeFragment = HomeFragment()
+    private val previewFragment = PreviewFragment()
     private val historyFragment = HistoryFragment()
     private val downloadsFragment = DownloadsFragment()
     private val settingsFragment = SettingsFragment()
-
-    // Cache dramas to avoid reloading on navigation
-    private var cachedDramas: List<Drama>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +41,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_cuplikan -> {
-                    // For now, show home fragment (can add preview later)
-                    loadFragment(homeFragment)
+                    loadFragment(previewFragment)
                     true
                 }
                 R.id.nav_history -> {
@@ -65,39 +62,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commitAllowingStateLoss()
+        val transaction = supportFragmentManager.beginTransaction()
+
+        // Hide all fragments first
+        val fragments = listOf(homeFragment, previewFragment, historyFragment, downloadsFragment, settingsFragment)
+        fragments.forEach { if (it.isAdded) transaction.hide(it) }
+
+        // Show or add the target fragment
+        if (fragment.isAdded) {
+            transaction.show(fragment)
+        } else {
+            transaction.add(R.id.fragmentContainer, fragment)
+        }
+
+        transaction.commitAllowingStateLoss()
     }
 
     fun fetchDramas(forceRefresh: Boolean = false, onComplete: (List<Drama>) -> Unit) {
-        if (!forceRefresh && cachedDramas != null) {
-            onComplete(cachedDramas!!)
-            return
-        }
-
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = ApiClient.dramaApi.getDramas()
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        val dramas = response.body() ?: emptyList()
-                        cachedDramas = dramas
-                        onComplete(dramas)
-                    } else {
-                        onComplete(cachedDramas ?: emptyList())
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onComplete(cachedDramas ?: emptyList())
-                }
+            val dramas = com.ins.insdrama.api.DramaRepository.getDramas(forceRefresh)
+            withContext(Dispatchers.Main) {
+                onComplete(dramas)
             }
         }
-    }
-
-    fun getCachedDrama(bookId: String): Drama? {
-        return cachedDramas?.find { it.bookId == bookId }
     }
 
     fun saveToHistory(drama: Drama, episodeIndex: Int, watchedAt: Long = System.currentTimeMillis()) {

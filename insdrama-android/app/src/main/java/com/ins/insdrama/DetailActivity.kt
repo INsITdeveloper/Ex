@@ -43,10 +43,13 @@ class DetailActivity : AppCompatActivity() {
         if (drama == null) {
             val bookId = intent.getStringExtra("bookId")
             if (bookId != null) {
-                // Fetch full drama data from API (which will use cache if available in ApiClient if we implement it there)
-                // For now, call fetchDramaData which will handle loading
-                fetchDramaData(bookId)
-                return
+                // Try to get from cache first via Repository
+                drama = com.ins.insdrama.api.DramaRepository.getDrama(bookId)
+                if (drama == null) {
+                    // Fetch full drama data from API
+                    fetchDramaData(bookId)
+                    return
+                }
             }
         }
 
@@ -63,23 +66,14 @@ class DetailActivity : AppCompatActivity() {
     private fun fetchDramaData(bookId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Try to get from MainActivity's cache if possible (in case we're in the same process)
-                // If not, fetch from API
-                val response = com.ins.insdrama.api.ApiClient.dramaApi.getDramas()
+                val dramas = com.ins.insdrama.api.DramaRepository.getDramas(forceRefresh = false)
                 withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        val dramas = response.body() ?: emptyList()
-                        drama = dramas.find { it.bookId == bookId }
-                        if (drama != null) {
-                            setupViews()
-                            loadDramaData()
-                        } else {
-                            Toast.makeText(this@DetailActivity, "Drama tidak ditemukan", Toast.LENGTH_SHORT).show()
-                            // Don't finish if we still have some data? No, we need full data.
-                            finish()
-                        }
+                    drama = dramas.find { it.bookId == bookId }
+                    if (drama != null) {
+                        setupViews()
+                        loadDramaData()
                     } else {
-                        Toast.makeText(this@DetailActivity, "Gagal memuat data: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DetailActivity, "Drama tidak ditemukan", Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 }
